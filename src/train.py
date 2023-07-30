@@ -1,3 +1,4 @@
+import datetime
 import torch
 from torch import nn
 import sys
@@ -10,8 +11,9 @@ import time
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 import os
 import pickle
+import wandb
 
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, matthews_corrcoef
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import accuracy_score, f1_score
@@ -229,19 +231,40 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
 
         results = torch.cat(results)
         truths = torch.cat(truths)
-        print(results.shape)
-        print(truths.shape)
-        print(results)
-        print(truths)
         return avg_loss, results, truths
 
     best_valid = 1e8
+    best_report = None
+    best_mcc = None
+    timestamp = str(datetime.datetime.now())
+    wandb.init(
+        project='trash',
+        name=str(timestamp) + '_' + hyp_params.dataset,
+        config=vars(hyp_params)
+    )
     for epoch in range(1, hyp_params.num_epochs+1):
         start = time.time()
-        train(model, optimizer, criterion, ctc_a2l_module, ctc_v2l_module, ctc_a2l_optimizer, ctc_v2l_optimizer, ctc_criterion)
+        epoch_loss = train(model, optimizer, criterion, ctc_a2l_module, ctc_v2l_module, ctc_a2l_optimizer, ctc_v2l_optimizer, ctc_criterion)
         val_loss, _, _ = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=False)
-        test_loss, _, _ = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=True)
+        test_loss, results, truths = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=True)
         
+        if 'm3a' in hyp_params.dataset:
+            results = torch.where(results > 0.5, 1.0, 0.0)
+            report = classification_report(truths.detach().numpy(), results.detach().numpy())
+            mcc = matthews_corrcoef(truths.detach().numpy(), results.detach().numpy())
+            if best_report is None:
+                best_report = report
+                best_mcc = mcc
+            elif best_report['weighted avg']['f1-score'] < report['weighted avg']['f1-score']:
+                best_report = report
+                best_mcc = mcc
+            wandb.log({
+                'Total loss': epoch_loss,
+                'MCC': mcc,
+                'F1-score': report['weighted avg']['f1-score']
+            })
+
+
         end = time.time()
         duration = end-start
         scheduler.step(val_loss)    # Decay learning rate by validation loss
@@ -254,6 +277,11 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             print(f"Saved model at pre_trained_models/{hyp_params.name}.pt!")
             save_model(hyp_params, model, name=hyp_params.name)
             best_valid = val_loss
+
+    wandb.log({
+        'Best F1-score': best_report['weighted avg']['f1-score'],
+        'Best MCC': best_mcc
+    })
 
     model = load_model(hyp_params, name=hyp_params.name)
     _, results, truths = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=True)
