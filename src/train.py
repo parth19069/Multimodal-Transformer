@@ -250,8 +250,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
         
         if 'm3a' in hyp_params.dataset:
             results = torch.where(results > 0.5, 1.0, 0.0)
-            report = classification_report(truths.detach().numpy(), results.detach().numpy())
-            mcc = matthews_corrcoef(truths.detach().numpy(), results.detach().numpy())
+            report = classification_report(truths.detach().cpu().numpy(), results.detach().cpu().numpy())
+            mcc = matthews_corrcoef(truths.detach().cpu().numpy(), results.detach().cpu().numpy())
             if best_report is None:
                 best_report = report
                 best_mcc = mcc
