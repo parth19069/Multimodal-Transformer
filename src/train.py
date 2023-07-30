@@ -215,7 +215,12 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 
                 net = nn.DataParallel(model) if batch_size > 10 else model
                 preds, _ = net(text, audio, vision)
-                print(preds)
+
+                if 'm3a' in hyp_params.dataset:
+                    logits = nn.Sigmoid()(preds)
+                    output_predictions = (logits > 0.5)
+                    print(output_predictions.shape)
+                    print(output_predictions)
                 if hyp_params.dataset == 'iemocap':
                     preds = preds.view(-1, 2)
                     eval_attr = eval_attr.view(-1)
