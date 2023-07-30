@@ -91,11 +91,13 @@ use_cuda = False
 output_dim_dict = {
     'mosi': 1,
     'mosei_senti': 1,
-    'iemocap': 8
+    'iemocap': 8,
+    'm3a_0': 1
 }
 
 criterion_dict = {
-    'iemocap': 'CrossEntropyLoss'
+    'iemocap': 'CrossEntropyLoss',
+    'm3a_0': 'BCEWithLogitsLoss'
 }
 
 torch.set_default_tensor_type('torch.FloatTensor')
