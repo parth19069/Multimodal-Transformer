@@ -238,8 +238,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
     best_mcc = None
     timestamp = str(datetime.datetime.now())
     wandb.init(
-        project='trash',
-        name=str(timestamp) + '_' + hyp_params.dataset,
+        project='ssmix',
+        name=str(timestamp) + '_' + 'mult_' + hyp_params.dataset,
         config=vars(hyp_params)
     )
     for epoch in range(1, hyp_params.num_epochs+1):
