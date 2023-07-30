@@ -21,9 +21,9 @@ parser.add_argument('--lonly', action='store_true',
                     help='use the crossmodal fusion into l (default: False)')
 parser.add_argument('--aligned', action='store_true',
                     help='consider aligned experiment or not (default: False)')
-parser.add_argument('--dataset', type=str, default='mosei_senti',
+parser.add_argument('--dataset', type=str, default='m3a_0',
                     help='dataset to use (default: mosei_senti)')
-parser.add_argument('--data_path', type=str, default='data',
+parser.add_argument('--data_path', type=str, default='/home/shivama2/ssmix/multimodal-mixup-staging/m3a/processed_data',
                     help='path for storing the dataset')
 
 # Dropouts

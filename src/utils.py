@@ -9,7 +9,7 @@ def get_data(args, dataset, split='train'):
     if not os.path.exists(data_path):
         print(f"  - Creating new {split} data")
         data = Multimodal_Datasets(args.data_path, dataset, split, args.aligned)
-        torch.save(data, data_path)
+        # torch.save(data, data_path)
     else:
         print(f"  - Found cached {split} data")
         data = torch.load(data_path)
