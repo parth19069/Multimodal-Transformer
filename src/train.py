@@ -218,7 +218,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
 
                 if 'm3a' in hyp_params.dataset:
                     logits = nn.Sigmoid()(preds)
-                    output_predictions = (logits > 0.5)
+                    output_predictions = torch.where(logits > 0.5, 1, 0)
                     print(output_predictions.shape)
                     print(output_predictions)
                 if hyp_params.dataset == 'iemocap':
