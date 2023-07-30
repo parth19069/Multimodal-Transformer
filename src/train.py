@@ -216,9 +216,6 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 net = nn.DataParallel(model) if batch_size > 10 else model
                 preds, _ = net(text, audio, vision)
 
-                if 'm3a' in hyp_params.dataset:
-                    logits = nn.Sigmoid()(preds)
-                    preds = torch.where(logits > 0.5, 1, 0)
                 if hyp_params.dataset == 'iemocap':
                     preds = preds.view(-1, 2)
                     eval_attr = eval_attr.view(-1)
