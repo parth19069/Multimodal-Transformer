@@ -92,12 +92,16 @@ output_dim_dict = {
     'mosi': 1,
     'mosei_senti': 1,
     'iemocap': 8,
-    'm3a_0': 1
+    'm3a_0': 1,
+    'm3a_1': 1,
+    'm3a_2': 1
 }
 
 criterion_dict = {
     'iemocap': 'CrossEntropyLoss',
-    'm3a_0': 'BCEWithLogitsLoss'
+    'm3a_0': 'BCEWithLogitsLoss',
+    'm3a_1': 'BCEWithLogitsLoss',
+    'm3a_2': 'BCEWithLogitsLoss'
 }
 
 torch.set_default_tensor_type('torch.FloatTensor')
