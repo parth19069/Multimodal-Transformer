@@ -248,7 +248,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
         val_loss, _, _ = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=False)
         test_loss, results, truths = evaluate(model, ctc_a2l_module, ctc_v2l_module, criterion, test=True)
         
-        if 'm3a' in hyp_params.dataset:
+        if 'm3a' in hyp_params.dataset or 'ec' in hyp_params.dataset:
             results = torch.where(results > 0.5, 1.0, 0.0)
             report = classification_report(truths.detach().cpu().numpy().squeeze(), results.detach().cpu().numpy().squeeze(), output_dict=True)
             mcc = matthews_corrcoef(truths.detach().cpu().numpy().squeeze(), results.detach().cpu().numpy().squeeze())
